@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoidGPT</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <div class="chat-container">
+            <!-- Navbar -->
+            <div class="navbar">
+                <div class="navbar-content">
+                    <div class="logo">
+                        <i class="fas fa-robot"></i>
+                        <span>VoidGPT</span>
+                    </div>
+                    <div class="navbar-actions">
+                        <a href="https://github.com/void-eth" target="_blank" class="icon-button github-link" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+						<div class="model-selector">
+						    <button class="icon-button model-toggle" id="model-toggle" aria-label="Change model">
+						        <i class="fas fa-microchip"></i>
+						    </button>
+						    <div class="model-dropdown" id="model-dropdown">
+						        <div class="model-header">
+						            <span>Select Model</span>
+						        </div>
+						        <div class="model-option" data-model="auto">
+						            <span class="model-name">Auto</span>
+						            <span class="model-description">Default model selection</span>
+						        </div>
+						        <div class="model-option" data-model="gpt-4o-mini">
+						            <span class="model-name">GPT-4o Mini</span>
+						            <span class="model-description">Fast & efficient</span>
+						        </div>
+						        <div class="model-option" data-model="gpt-4o">
+						            <span class="model-name">GPT-4o</span>
+						            <span class="model-description">Most powerful</span>
+						        </div>
+						        <div class="model-option" data-model="o4-mini">
+						            <span class="model-name">O4 Mini</span>
+						            <span class="model-description">Balanced performance</span>
+						        </div>
+						    </div>
+						</div>
+                        <button class="icon-button" id="theme-toggle" aria-label="Toggle theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button class="icon-button" id="clear-chat" aria-label="Clear chat">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div class="chat-messages" id="chat-messages">
+                <div class="message-group">
+                    <div class="message ai-message animated fadeInUp">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-info">
+                                <span class="message-sender">VoidGPT</span>
+                                <span class="message-time">Just now</span>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm VoidGPT, your AI assistant. How can I help you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Input Area -->
+            <div class="chat-input-wrapper">
+                <div class="chat-input-container">
+                    <form id="chat-form">
+                        <div class="input-area">
+                            <textarea 
+                                id="prompt-input" 
+                                placeholder="Type your message..." 
+                                rows="1"
+                                autocomplete="off"
+                            ></textarea>
+                            <div class="input-actions">
+                                <button type="button" class="icon-button mic-button" id="voice-input" aria-label="Voice input">
+                                    <i class="fas fa-microphone"></i>
+                                    <div class="voice-wave" id="voice-wave">
+                                        <span class="voice-bar"></span>
+                                        <span class="voice-bar"></span>
+                                        <span class="voice-bar"></span>
+                                        <span class="voice-bar"></span>
+                                    </div>
+                                </button>
+                                <button type="submit" class="send-button" id="send-button" aria-label="Send message">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="input-info">
+                        <span>Powered by <a href="https://github.com/void-eth" target="_blank">void-eth</a> & <a href="https://github.com/OEvortex/Webscout" target="_blank">Webscout team</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Alert Modal -->
+    <div class="modal" id="alert-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirmation</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Are you sure you want to clear the chat history?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel-btn" id="modal-cancel">Cancel</button>
+                <button class="modal-btn confirm-btn" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
