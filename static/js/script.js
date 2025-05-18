@@ -306,10 +306,41 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	// Function to process message content with markdown
 	function processMessageContent(content, isUser) {
-	    // Process code blocks to add syntax highlighting
-	    const processedContent = marked.parse(content);
+	    // First, escape any HTML in the content to prevent XSS
+	    let safeContent = content;
 	    
-	    return processedContent;
+	    if (isUser) {
+	        // For user messages, encode HTML entities to prevent XSS
+	        safeContent = escapeHtml(content);
+	        
+	        // Add simple link formatting without using markdown parser
+	        safeContent = addSimpleLinks(safeContent);
+	        
+	        return safeContent;
+	    } else {
+	        // For AI responses, use marked with proper sanitization
+	        const processedContent = marked.parse(safeContent);
+	        return processedContent;
+	    }
+	}
+	
+	// Function to escape HTML to prevent XSS
+	function escapeHtml(unsafe) {
+	    return unsafe
+	        .replace(/&/g, "&amp;")
+	        .replace(/</g, "&lt;")
+	        .replace(/>/g, "&gt;")
+	        .replace(/"/g, "&quot;")
+	        .replace(/'/g, "&#039;");
+	}
+	
+	// Function to add simple link formatting to user messages
+	function addSimpleLinks(text) {
+	    // Regex to match URLs
+	    const urlRegex = /(https?:\/\/[^\s]+)/g;
+	    return text.replace(urlRegex, function(url) {
+	        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+	    });
 	}
 	
 	// Function to add copy buttons to code blocks
