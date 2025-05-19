@@ -29,7 +29,12 @@ def chat():
     # Call the AI function with the prompt
     response = generate_ai_response(prompt, model)
     
-    return jsonify({'response': response})
+    return jsonify({
+            'response': {
+                'content': response['content'],
+                'blocked': response['blocked']
+            }
+        })
 
 if __name__ == '__main__':
     app.run(debug=True)
