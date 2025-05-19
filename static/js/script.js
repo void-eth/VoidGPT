@@ -520,9 +520,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        setViewportHeight();
 	        updateContentPadding();
 	        scrollToBottom();
-	        if (document.activeElement === promptInput) {
-	            promptInput.scrollIntoView({ behavior: 'smooth' });
-	        }
 	    }, 150);
 	});
     
