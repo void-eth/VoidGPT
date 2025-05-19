@@ -206,103 +206,111 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Function to add a message to the chat
-	function addMessage(message, isUser = false) {
-	    // Create message group if it doesn't exist or if previous message was from a different sender
-	    let lastGroup = chatMessages.lastElementChild;
-	    const lastMessageIsUser = lastGroup ? 
-	        lastGroup.querySelector('.message').classList.contains('user-message') : false;
-	        
-	    // Create a new group if needed
-	    if (!lastGroup || lastMessageIsUser !== isUser) {
-	        lastGroup = document.createElement('div');
-	        lastGroup.classList.add('message-group');
-	        chatMessages.appendChild(lastGroup);
-	    }
-	    
-	    // Create message element
-	    const messageDiv = document.createElement('div');
-	    messageDiv.classList.add('message', 'animated', 'fadeInUp');
-	    messageDiv.classList.add(isUser ? 'user-message' : 'ai-message');
-	    
-	    // Add avatar
-	    const avatarDiv = document.createElement('div');
-	    avatarDiv.classList.add('message-avatar');
-	    const avatarIcon = document.createElement('i');
-	    avatarIcon.className = isUser ? 'fas fa-user' : 'fas fa-robot';
-	    avatarDiv.appendChild(avatarIcon);
-	    
-	    // Create message bubble
-	    const bubbleDiv = document.createElement('div');
-	    bubbleDiv.classList.add('message-bubble');
-	    
-	    // Add copy button to message
-	const copyButton = document.createElement('button');
-	copyButton.className = 'message-copy-button';
-	copyButton.innerHTML = '<i class="fas fa-copy"></i><span class="tooltip">Copy message</span>';
-	copyButton.addEventListener('click', function(e) {
-	    e.stopPropagation(); // Prevent bubble click events
-	    
-	    // Get just the text content without formatting
-	    const rawMessageText = message;
-	    
-	    navigator.clipboard.writeText(rawMessageText).then(function() {
-	        // Success feedback
-	        const originalHTML = copyButton.innerHTML;
-	        copyButton.innerHTML = '<i class="fas fa-check"></i><span class="tooltip">Copied!</span>';
-	        setTimeout(function() {
-	            copyButton.innerHTML = originalHTML;
-	        }, 2000);
-	    }).catch(function() {
-	        // Error feedback
-	        const originalHTML = copyButton.innerHTML;
-	        copyButton.innerHTML = '<i class="fas fa-times"></i><span class="tooltip">Error!</span>';
-	        setTimeout(function() {
-	            copyButton.innerHTML = originalHTML;
-	        }, 2000);
-	    });
-	});
-	bubbleDiv.appendChild(copyButton);
-	    
-	    // Add message info
-	    const infoDiv = document.createElement('div');
-	    infoDiv.classList.add('message-info');
-	    
-	    const senderSpan = document.createElement('span');
-	    senderSpan.classList.add('message-sender');
-	    senderSpan.textContent = isUser ? 'You' : 'VoidGPT';
-	    
-	    const timeSpan = document.createElement('span');
-	    timeSpan.classList.add('message-time');
-	    timeSpan.textContent = formatTime();
-	    
-	    infoDiv.appendChild(senderSpan);
-	    infoDiv.appendChild(timeSpan);
-	    
-	    // Add message content with markdown
-	    const contentDiv = document.createElement('div');
-	    contentDiv.classList.add('message-content');
-	    
-	    // Process markdown and set as HTML
-	    contentDiv.innerHTML = processMessageContent(message, isUser);
-	    
-	    // Add code block copy buttons
-	    setTimeout(() => {
-	        addCodeBlockCopyButtons(contentDiv);
-	    }, 0);
-	    
-	    // Assemble the message
-	    bubbleDiv.appendChild(infoDiv);
-	    bubbleDiv.appendChild(contentDiv);
-	    
-	    messageDiv.appendChild(avatarDiv);
-	    messageDiv.appendChild(bubbleDiv);
-	    
-	    // Add to chat
-	    lastGroup.appendChild(messageDiv);
-	    
-	    // Scroll to the bottom of the chat
-	    scrollToBottom();
-	}
+    function addMessage(message, isUser = false, isBlocked = false) {
+        // Create message group if it doesn't exist or if previous message was from a different sender
+        let lastGroup = chatMessages.lastElementChild;
+        const lastMessageIsUser = lastGroup ? 
+            lastGroup.querySelector('.message').classList.contains('user-message') : false;
+            
+        // Create a new group if needed
+        if (!lastGroup || lastMessageIsUser !== isUser) {
+            lastGroup = document.createElement('div');
+            lastGroup.classList.add('message-group');
+            chatMessages.appendChild(lastGroup);
+        }
+        
+        // Create message element
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'animated', 'fadeInUp');
+        messageDiv.classList.add(isUser ? 'user-message' : 'ai-message');
+        
+        // Add avatar
+        const avatarDiv = document.createElement('div');
+        avatarDiv.classList.add('message-avatar');
+        const avatarIcon = document.createElement('i');
+        avatarIcon.className = isUser ? 'fas fa-user' : 'fas fa-robot';
+        avatarDiv.appendChild(avatarIcon);
+        
+        // Create message bubble
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        
+        // Add copy button to message
+        const copyButton = document.createElement('button');
+        copyButton.className = 'message-copy-button';
+        copyButton.innerHTML = '<i class="fas fa-copy"></i><span class="tooltip">Copy message</span>';
+        copyButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent bubble click events
+            
+            // Get just the text content without formatting
+            const rawMessageText = message;
+            
+            navigator.clipboard.writeText(rawMessageText).then(function() {
+                // Success feedback
+                const originalHTML = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fas fa-check"></i><span class="tooltip">Copied!</span>';
+                setTimeout(function() {
+                    copyButton.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(function() {
+                // Error feedback
+                const originalHTML = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fas fa-times"></i><span class="tooltip">Error!</span>';
+                setTimeout(function() {
+                    copyButton.innerHTML = originalHTML;
+                }, 2000);
+            });
+        });
+        bubbleDiv.appendChild(copyButton);
+        
+        // Add message info
+        const infoDiv = document.createElement('div');
+        infoDiv.classList.add('message-info');
+        
+        const senderSpan = document.createElement('span');
+        senderSpan.classList.add('message-sender');
+        senderSpan.textContent = isUser ? 'You' : 'VoidGPT';
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.classList.add('message-time');
+        timeSpan.textContent = formatTime();
+        
+        infoDiv.appendChild(senderSpan);
+        infoDiv.appendChild(timeSpan);
+        
+        // Add message content with markdown
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        
+        // Process markdown and set as HTML
+        contentDiv.innerHTML = processMessageContent(message, isUser);
+        
+        // Add warning message if content is blocked (only for AI messages)
+        if (!isUser && isBlocked) {
+            const warningDiv = document.createElement('div');
+            warningDiv.classList.add('message-warning');
+            warningDiv.innerHTML = '⚠️ Warning: This response was flagged and may contain inappropriate content.';
+            contentDiv.appendChild(warningDiv);
+        }
+        
+        // Add code block copy buttons
+        setTimeout(() => {
+            addCodeBlockCopyButtons(contentDiv);
+        }, 0);
+        
+        // Assemble the message
+        bubbleDiv.appendChild(infoDiv);
+        bubbleDiv.appendChild(contentDiv);
+        
+        messageDiv.appendChild(avatarDiv);
+        messageDiv.appendChild(bubbleDiv);
+        
+        // Add to chat
+        lastGroup.appendChild(messageDiv);
+        
+        // Scroll to the bottom of the chat
+        scrollToBottom();
+    }
 	
 	// Function to process message content with markdown
 	function processMessageContent(content, isUser) {
@@ -471,8 +479,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remove thinking indicator
             removeThinking();
             
-            // Add AI response to chat
-            addMessage(data.response);
+            // Add AI response to chat - now with the blocked flag
+            addMessage(data.response.content, false, data.response.blocked);
         } catch (error) {
             // Remove thinking indicator
             removeThinking();
