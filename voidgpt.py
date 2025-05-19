@@ -163,21 +163,37 @@ class ChatGPTReversed:
         return prefix + base64_str
 
     def parse_response(self, input_text):
-        """Parse the response from ChatGPT."""
-        parts = [part.strip() for part in input_text.split("\n") if part.strip()]
-
+        """Parse the streamed response from ChatGPT."""
+        parts = [part.strip() for part in input_text.split("\n") if part.strip() and part.startswith("data: ")]
+        
+        full_content = ""
+        content_blocked = False
+        
         for part in parts:
             try:
-                if part.startswith("data: "):
-                    json_data = json.loads(part[6:])
-                    if (json_data.get("message") and
-                        json_data["message"].get("status") == "finished_successfully" and
-                        json_data["message"].get("metadata", {}).get("is_complete")):
-                        return json_data["message"]["content"]["parts"][0]
-            except:
-                pass
-
-        return input_text  # Return raw text if parsing fails
+                json_data = json.loads(part[6:])
+                
+                # Check for moderation events with blocked content
+                if json_data.get("type") == "moderation" and json_data.get("moderation_response", {}).get("blocked"):
+                    content_blocked = True
+                    continue
+                
+                # Get message content if available
+                if json_data.get("message") and json_data["message"].get("content", {}).get("parts"):
+                    message_parts = json_data["message"]["content"]["parts"]
+                    if message_parts and len(message_parts) > 0:
+                        full_content = message_parts[0]  # Get the latest accumulated content
+                        
+            except json.JSONDecodeError:
+                print(f"Failed to parse JSON: {part[6:]}")
+            except Exception as e:
+                print(f"Error processing part: {e}")
+        
+        # Return both the content and blocked status
+        return {
+            "content": full_content if full_content else input_text,
+            "blocked": content_blocked
+        }
 
     def rotate_session_data(self):
         """Rotate session data to maintain fresh authentication."""
