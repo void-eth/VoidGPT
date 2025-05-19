@@ -1209,3 +1209,24 @@ a:hover {
     color: white;
     text-decoration: underline;
 }
+
+/* Warning message for flagged content */
+.message-warning {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background-color: rgba(255, 187, 0, 0.1);
+    border-left: 3px solid #ffbb00;
+    color: #e67700;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dark-theme .message-warning {
+    background-color: rgba(255, 187, 0, 0.15);
+    color: #ffcc5c;
+    border-color: #ffbb00;
+}
